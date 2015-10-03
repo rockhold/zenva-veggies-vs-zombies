@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Veggies Vs Zombies</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
+        <script src="lib/quintus.js"></script>
+        <script src="lib/quintus_sprites.js"></script>
+        <script src="lib/quintus_scenes.js"></script>
+        <script src="lib/quintus_input.js"></script>
+        <script src="lib/quintus_anim.js"></script>
+        <script src="lib/quintus_2d.js"></script>
+        <script src="lib/quintus_touch.js"></script>
+        <script src="lib/quintus_ui.js"></script>
+        <script src="lib/quintus_audio.js"></script>
+    </head>
+    <body style="background-color: black; margin: 0px; border: 0px;">
+        <script>
+            window.addEventListener("load", function() {
+                var Q = window.Q = Quintus({development: true})
+                    .include("Sprites, Scenes, 2D, UI")
+                    .setup({
+                        width: 1080,
+                        height: 720,
+                        scaleToFit: true
+                    });
+
+                // Turn off gravity
+                Q.gravityX = 0;
+                Q.gravityY = 0;
+
+                // Constants used for collision detection; uses a binary operator when comparing, which is why it uses powers of two...
+                Q.SPRITE_SUN = 2;
+                Q.SPRITE_ZOMBIE = 4;
+                Q.SPRITE_PLANT = 8;
+                Q.SPRITE_BULLET = 16;
+                Q.SPRITE_GROUND = 32;
+
+                Q.Sprite.extend("Zombie", {
+                    init: function(p) {
+                        this._super(p, {
+                            asset: "zombie1.png",
+                            type: Q.SPRITE_ZOMBIE,
+                            collisionMask: Q.SPRITE_PLANT | Q.SPRITE_BULLET,
+                            vx: -30
+                        });
+
+                        this.add("2d");
+                    },
+
+                    step: function(dt) {
+                        // If zombie collides with home
+                        if (this.p.x <= 240) {
+                            this.destroy();
+
+                            // restart the game
+                            Q.stageScene("level");
+                        }
+                    }
+
+                });
+
+                Q.UI.Container.extend("SidePanel", {
+                    init: function() {
+                        this._super({
+                            fill: "#E1DEB7",
+                            x: 120/2,
+                            y: 720/2,
+                            radius: 0,
+                            border: 0,
+                            shadow: 0,
+                            w: 120,
+                            h: 720
+                        });
+
+                        this.on("inserted");
+                    },
+
+                    inserted: function() {
+                        var sun = new Q.Sprite({
+                            asset: "sun.png",
+                            x: 60,
+                            y: 40
+                        });
+                        this.stage.insert(sun);
+
+                        this.totalSun = new Q.UI.Text({
+                            x: 60,
+                            y: 100,
+                            label: "100"
+                        });
+                        this.stage.insert(this.totalSun);
+                    }
+                });
+
+                Q.scene("level", function(stage) {
+                    var sprite1 = new Q.Sprite({
+                        x: 120 + 960/2,
+                        y: 720/2,
+                        asset: "background.png",
+                        type: Q.SPRITE_GROUND
+                    });
+
+                    var sprite2 = new Q.Zombie({
+                        x: 500,
+                        y: 600
+                    });
+
+                    var sprite3 = new Q.Zombie({
+                        x: 700,
+                        y: 100
+                    });
+
+                    var sprite4 = new Q.Zombie({
+                        x: 700,
+                        y: 600
+                    });
+
+                    stage.insert(sprite1);
+                    stage.insert(sprite2);
+                    stage.insert(sprite3);
+                    stage.insert(sprite4);
+
+                    var sidePanel = new Q.SidePanel();
+                    stage.insert(sidePanel);
+                });
+
+                Q.load("background.png, sun.png, zombie1.png", function() {
+                    Q.stageScene("level");
+                });
+            });
+        </script>
+    </body>
+</html>
