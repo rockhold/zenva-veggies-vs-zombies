@@ -13,12 +13,14 @@
         <script src="lib/quintus_touch.js"></script>
         <script src="lib/quintus_ui.js"></script>
         <script src="lib/quintus_audio.js"></script>
+        <script src="scripts/zombies-gui.js"></script>
+        <script src="scripts/zombies-enemies.js"></script>
     </head>
     <body style="background-color: black; margin: 0px; border: 0px;">
         <script>
             window.addEventListener("load", function() {
                 var Q = window.Q = Quintus({development: true})
-                    .include("Sprites, Scenes, 2D, UI")
+                    .include("Sprites, Scenes, 2D, UI, ZombiesGUI, ZombiesEnemies")
                     .setup({
                         width: 1080,
                         height: 720,
@@ -36,63 +38,6 @@
                 Q.SPRITE_BULLET = 16;
                 Q.SPRITE_GROUND = 32;
 
-                Q.Sprite.extend("Zombie", {
-                    init: function(p) {
-                        this._super(p, {
-                            asset: "zombie1.png",
-                            type: Q.SPRITE_ZOMBIE,
-                            collisionMask: Q.SPRITE_PLANT | Q.SPRITE_BULLET,
-                            vx: -30
-                        });
-
-                        this.add("2d");
-                    },
-
-                    step: function(dt) {
-                        // If zombie collides with home
-                        if (this.p.x <= 240) {
-                            this.destroy();
-
-                            // restart the game
-                            Q.stageScene("level");
-                        }
-                    }
-
-                });
-
-                Q.UI.Container.extend("SidePanel", {
-                    init: function() {
-                        this._super({
-                            fill: "#E1DEB7",
-                            x: 120/2,
-                            y: 720/2,
-                            radius: 0,
-                            border: 0,
-                            shadow: 0,
-                            w: 120,
-                            h: 720
-                        });
-
-                        this.on("inserted");
-                    },
-
-                    inserted: function() {
-                        var sun = new Q.Sprite({
-                            asset: "sun.png",
-                            x: 60,
-                            y: 40
-                        });
-                        this.stage.insert(sun);
-
-                        this.totalSun = new Q.UI.Text({
-                            x: 60,
-                            y: 100,
-                            label: "100"
-                        });
-                        this.stage.insert(this.totalSun);
-                    }
-                });
-
                 Q.scene("level", function(stage) {
                     var sprite1 = new Q.Sprite({
                         x: 120 + 960/2,
@@ -101,20 +46,38 @@
                         type: Q.SPRITE_GROUND
                     });
 
-                    var sprite2 = new Q.Zombie({
-                        x: 500,
-                        y: 600
-                    });
+                    var sprite2 = new Q.Zombie(
+                        Q._extend(
+                            {
+                                x: 900,
+                                y: 300
+                            },
 
-                    var sprite3 = new Q.Zombie({
-                        x: 700,
-                        y: 100
-                    });
+                            Q.zombieTypes["skeleton"]
+                        )
+                    );
 
-                    var sprite4 = new Q.Zombie({
-                        x: 700,
-                        y: 600
-                    });
+                    var sprite3 = new Q.Zombie(
+                        Q._extend(
+                            {
+                                x: 900,
+                                y: 100
+                            },
+
+                            Q.zombieTypes["basic"]
+                        )
+                    );
+
+                    var sprite4 = new Q.Zombie(
+                        Q._extend(
+                            {
+                                x: 900,
+                                y: 600
+                            },
+
+                            Q.zombieTypes["chicken"]
+                        )
+                    );
 
                     stage.insert(sprite1);
                     stage.insert(sprite2);
@@ -125,7 +88,7 @@
                     stage.insert(sidePanel);
                 });
 
-                Q.load("background.png, sun.png, zombie1.png", function() {
+                Q.load("background.png, sun.png, zombie1.png, zombie2.png, zombie3.png, chicken.png", function() {
                     Q.stageScene("level");
                 });
             });
