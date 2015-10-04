@@ -16,12 +16,13 @@
         <script src="scripts/zombies-gui.js"></script>
         <script src="scripts/zombies-enemies.js"></script>
         <script src="scripts/zombies-plants.js"></script>
+        <script src="scripts/zombies-gameplay.js"></script>
     </head>
     <body style="background-color: black; margin: 0px; border: 0px;">
         <script>
             window.addEventListener("load", function() {
                 var Q = window.Q = Quintus({development: true})
-                    .include("Sprites, Scenes, 2D, UI, Touch, ZombiesGUI, ZombiesEnemies, ZombiesPlants")
+                    .include("Sprites, Scenes, 2D, UI, Touch, ZombiesGUI, ZombiesEnemies, ZombiesPlants, ZombiesGameplay")
                     .setup({
                         width: 1080,
                         height: 720,
@@ -38,22 +39,12 @@
                 Q.SPRITE_PLANT = 8;
                 Q.SPRITE_BULLET = 16;
                 Q.SPRITE_GROUND = 32;
+                Q.SPRITE_UI = 64;
 
-                Q.touch(Q.SPRITE_SUN);
+                Q.touch(Q.SPRITE_SUN | Q.SPRITE_GROUND | Q.SPRITE_UI);
 
                 Q.scene("level", function(stage) {
-                    var background = new Q.Sprite({
-                        x: 120 + 960/2,
-                        y: 720/2,
-                        asset: "background.png",
-                        type: Q.SPRITE_GROUND
-                    });
-
-                    var sun1 = new Q.Sun();
-                    var sun2 = new Q.Sun();
-                    var sun3 = new Q.Sun();
-                    var sun4 = new Q.Sun();
-                    var sun5 = new Q.Sun();
+                    var level = new Q.Level();
 
                     var zombie1 = new Q.Zombie(
                         Q._extend(
@@ -88,23 +79,55 @@
                         )
                     );
 
-                    stage.insert(background);
+                    stage.insert(level);
                     stage.insert(zombie1);
                     stage.insert(zombie2);
                     stage.insert(zombie3);
-                    stage.insert(sun1);
-                    stage.insert(sun2);
-                    stage.insert(sun3);
-                    stage.insert(sun4);
-                    stage.insert(sun5);
+
+                    // Hardcode some plants for now...
+                    var plant1 = new Q.Plant(
+                        Q._extend(
+                            {
+                                x: 600,
+                                y: 600
+                            },
+                            Q.plantTypes["carnivorous"]
+                        )
+                    );
+                    stage.insert(plant1);
+
+                    var plant2 = new Q.Plant(
+                        Q._extend(
+                            {
+                                x: 600,
+                                y: 100
+                            },
+                            Q.plantTypes["carnivorous"]
+                        )
+                    );
+                    stage.insert(plant2);
+
 
                     var sidePanel = new Q.SidePanel();
                     stage.insert(sidePanel);
                 });
 
-                Q.load("background.png, sun.png, zombie1.png, zombie2.png, zombie3.png, chicken.png", function() {
-                    Q.state.reset({sun: 120});
-                    Q.stageScene("level");
+                Q.load("background.png, sun.png, zombie1.png, zombie2.png, zombie3.png, chicken.png, carnivorousplant.png, corn.png, chilli.png, sunflower.png, bullet.png", function() {
+                    Q.state.reset({sun: 100});
+                    Q.stageScene("level", 0);
+                    Q.stageScene("sun", 1);
+
+                    var sun1 = new Q.Sun();
+                    var sun2 = new Q.Sun();
+                    var sun3 = new Q.Sun();
+                    var sun4 = new Q.Sun();
+                    var sun5 = new Q.Sun();
+
+                    Q.stage(1).insert(sun1);
+                    Q.stage(1).insert(sun2);
+                    Q.stage(1).insert(sun3);
+                    Q.stage(1).insert(sun4);
+                    Q.stage(1).insert(sun5);
                 });
             });
         </script>
