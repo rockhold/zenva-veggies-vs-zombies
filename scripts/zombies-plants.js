@@ -46,7 +46,9 @@ Quintus.ZombiesPlants = function(Q) {
         sunflower: {
             asset: "sunflower.png",
             cost: 75,
-            energy: 15
+            energy: 15,
+            isSunProducer: true,
+            sunFrequency: 10
         }
     };
 
@@ -60,6 +62,10 @@ Quintus.ZombiesPlants = function(Q) {
 
             if (this.p.isShooter) {
                 this.p.timeToShoot = this.p.shootingFrequency;
+            }
+
+            if (this.p.isSunProducer) {
+                this.p.timeToSun = this.p.sunFrequency;
             }
         },
 
@@ -75,6 +81,21 @@ Quintus.ZombiesPlants = function(Q) {
                         x: this.p.x,
                         y: this.p.y,
                         damage: this.p.damage
+                    }));
+                }
+            }
+
+            if (this.p.isSunProducer) {
+                this.p.timeToSun -= dt;
+
+                if (this.p.timeToSun <= 0) {
+                    this.p.timeToSun = this.p.sunFrequency;
+
+                    Q.stage(1).insert(new Q.Sun({
+                        x: this.p.x - 50 + 100 * Math.random(),
+                        y: this.p.y,
+                        finalY: this.p.y,
+                        vy: 0
                     }));
                 }
             }
