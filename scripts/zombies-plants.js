@@ -39,7 +39,9 @@ Quintus.ZombiesPlants = function(Q) {
         chilli: {
             asset: "chilli.png",
             cost: 50,
-            energy: 10
+            energy: 10,
+            isExploding: true,
+            damage: 50
         },
         sunflower: {
             asset: "sunflower.png",
@@ -53,7 +55,7 @@ Quintus.ZombiesPlants = function(Q) {
             this._super(p, {
                 type: Q.SPRITE_PLANT
             });
-            
+
             this.add("2d");
 
             if (this.p.isShooter) {
@@ -77,13 +79,13 @@ Quintus.ZombiesPlants = function(Q) {
                 }
             }
 
-            if(this.p.energy <= 0) {
+            if (this.p.energy <= 0) {
                 this.destroy();
             }
         },
 
         takeDamage: function(damage) {
-            this.p.energy -= damage/50;
+            this.p.energy -= damage / 50;
         }
     });
 
